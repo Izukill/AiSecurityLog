@@ -1,13 +1,25 @@
 import pandas as pd
 from sklearn.ensemble import IsolationForest
 import joblib
+import numpy as np
 
 print("Carregando o dataset de logs")
 df = pd.read_csv('Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv')
 
-#características numéricas para o modelo
-features = [col for col in df.columns if df[col].dtype in ['int64', 'float64']]
+#características escolihas para o modelo analisar
+features = [
+    ' Destination Port', 
+    ' Flow Duration', 
+    'Total Length of Fwd Packets', 
+    ' Total Length of Bwd Packets', 
+    'Flow Bytes/s', 
+    ' Packet Length Mean']
+
+df = df[features]
+df = df.replace([np.inf, -np.inf], np.nan).dropna() #limpeza dos dados, removendo valores infinitos e nulos
+
 X = df[features]
+
 
 print("Treinando o modelo Isolation Forest para detecção de anomalias nos logs")
 
