@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "*") //coloquei apenas para o cors não impedir os testes, mas para implementação em sistemas reais retire
 @RequestMapping("/api/seguranca")
 public class AiRestController {
 
