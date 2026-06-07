@@ -1,12 +1,10 @@
 package izuki.Ai.controller;
-import izuki.Ai.dto.AiResponseDTO;
+
 import izuki.Ai.dto.LogRequestDTO;
 import izuki.Ai.service.AiIntegracaoService;
+import izuki.Ai.service.HttpRequestService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/seguranca")
@@ -14,19 +12,45 @@ public class AiRestController {
 
     private final AiIntegracaoService aiService;
 
-    public AiRestController(AiIntegracaoService aiService) {
+    private final HttpRequestService httpRequestService;
+
+    public AiRestController(AiIntegracaoService aiService, HttpRequestService httpRequestService) {
         this.aiService = aiService;
+        this.httpRequestService = httpRequestService;
     }
 
     @PostMapping("/verificar")
-    public ResponseEntity<?> verificarLog(@RequestBody LogRequestDTO logRequest) {
+    public ResponseEntity<?> verificarLog(
+            @RequestParam(required = false) String tipo,
+            @RequestBody(required = false) LogRequestDTO customLog) {
 
-        AiResponseDTO respostaIa = aiService.analisarTrafego(logRequest);
+        LogRequestDTO logParaAnalisar;
 
-        if (respostaIa != null && respostaIa.getAlertaSeguranca()) {
-            return ResponseEntity.status(403).body("ACESSO BLOQUEADO: Anomalia detectada pela I.A.");
+        //se vier tipo na url
+        if (tipo != null) {
+            switch (tipo.toUpperCase()) {
+                case "NORMAL":
+                    logParaAnalisar = httpRequestService.gerarTrafegoNormal();
+                    break;
+                case "ATAQUE_WEB":
+                    logParaAnalisar = httpRequestService.gerarAtaqueWeb();
+                    break;
+                case "SCAN":
+                    logParaAnalisar = httpRequestService.gerarVarreduraPortas();
+                    break;
+                default:
+                    return ResponseEntity.badRequest().build();
+            }
+        }
+        //se não veio tipo, é o usuário digitando os valores na mão (Customizado)
+        else {
+            if (customLog == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            logParaAnalisar = customLog;
         }
 
-        return ResponseEntity.ok("Acesso Permitido. Tráfego normal.");
+        //manda o log final para a IA em python
+        return ResponseEntity.ok(aiService.analisarTrafego(logParaAnalisar));
     }
 }
