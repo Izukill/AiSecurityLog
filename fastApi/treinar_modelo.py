@@ -4,7 +4,15 @@ import joblib
 import numpy as np
 
 print("Carregando o dataset de logs")
-df = pd.read_csv('Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv')
+
+#caso queria treinar com outros datasets, basta colocar o caminho do csv aqui, lembrando que os arquivos devem ter as mesmas colunas para o modelo analisar
+df_web = pd.read_csv('Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv')
+df_ddos = pd.read_csv('Wednesday-workingHours.pcap_ISCX.csv')
+df_scan = pd.read_csv('Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv')
+df_brute  = pd.read_csv('Tuesday-WorkingHours.pcap_ISCX.csv')
+
+#juntando os datasets em um único dataframe para o treinamento do modelo
+df_completo = pd.concat([df_web, df_ddos, df_scan, df_brute])
 
 #características escolihas para o modelo analisar
 features = [
@@ -15,10 +23,11 @@ features = [
     'Flow Bytes/s', 
     ' Packet Length Mean']
 
-df = df[features]
-df = df.replace([np.inf, -np.inf], np.nan).dropna() #limpeza dos dados, removendo valores infinitos e nulos
 
-X = df[features]
+df_completo = df_completo[features]
+df_completo = df_completo.replace([np.inf, -np.inf], np.nan).dropna() #limpeza dos dados, removendo valores infinitos e nulos
+
+X = df_completo[features]
 
 
 print("Treinando o modelo Isolation Forest para detecção de anomalias nos logs")
@@ -32,11 +41,11 @@ joblib.dump(modelo, 'detector_logs.pkl')
 print("\n[Sucesso] Inteligência Artificial treinada e salva como 'detector_logs.pkl'")
 
 #teste para ver quantas anomalias ele achou
-df['predicao'] = modelo.predict(X)
+df_completo['predicao'] = modelo.predict(X)
 
 #isolation Forest retorna 1 para normal e -1 para anomalia
-anomalias_detectadas = df[df['predicao'] == -1]
+anomalias_detectadas = df_completo[df_completo['predicao'] == -1]
 
 print(f"\nResumo do Treinamento:")
-print(f"Total de logs analisados: {len(df)}")
+print(f"Total de logs analisados: {len(df_completo)}")
 print(f"Possíveis ataques detectados pela IA: {len(anomalias_detectadas)}")
