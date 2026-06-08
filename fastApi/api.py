@@ -13,7 +13,7 @@ app = FastAPI(
 )
 
 print("Carregando o modelo de IA na memória")
-modelo = joblib.load('detector_logs.pkl')
+modelo = joblib.load('detector_logs.pkl') #carregando o modelo com o pkl
 
 
 class LogRequest(BaseModel):
@@ -29,18 +29,18 @@ class LogRequest(BaseModel):
 def analisar_log(log: LogRequest):
 
     df_novo_log = pd.DataFrame([log.dict(by_alias=True)])
-    predicao = modelo.predict(df_novo_log)[0]
+    predicao_texto = modelo.predict(df_novo_log)[0]
     
-    if predicao == -1:
+    if predicao_texto == 'BENIGN':
          return {
-             "status": "ATAQUE DETECTADO", 
-             "codigo_ia": int(predicao), 
-             "alerta_seguranca": True
+             "status": "Tráfego Seguro", 
+             "codigo_ia": 200, 
+             "alerta_seguranca": False
          }
     else:
          return {
-             "status": "TRAFEGO NORMAL", 
-             "codigo_ia": int(predicao), 
-             "alerta_seguranca": False
+             "status": f"Ataque Detectado: {predicao_texto}", 
+             "codigo_ia": 403, 
+             "alerta_seguranca": True
          }
     
