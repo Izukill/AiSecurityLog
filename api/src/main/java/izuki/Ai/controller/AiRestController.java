@@ -39,6 +39,9 @@ public class AiRestController {
                 case "SCAN":
                     logParaAnalisar = httpRequestService.gerarVarreduraPortas();
                     break;
+                case "BRUTE_FORCE":
+                    logParaAnalisar = httpRequestService.gerarForcaBruta();
+                    break;
                 default:
                     return ResponseEntity.badRequest().build();
             }

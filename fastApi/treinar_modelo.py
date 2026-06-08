@@ -35,7 +35,7 @@ Y = df_completo[' Label']
 print("Treinando o modelo Random Forest para detecção de anomalias nos logs")
 
 #carregando o modelo de detecção de anomalias Random Forest
-modelo = RandomForestClassifier(n_estimators=50, random_state=42)
+modelo = RandomForestClassifier(n_estimators=50, random_state=42, class_weight='balanced')
 modelo.fit(X, Y)
 
 #salvando o pickle 
