@@ -42,6 +42,9 @@ public class AiRestController {
                 case "BRUTE_FORCE":
                     logParaAnalisar = httpRequestService.gerarForcaBruta();
                     break;
+                case "ATAQUE_DOS":
+                    logParaAnalisar = httpRequestService.gerarAtaqueDoS();
+                    break;
                 default:
                     return ResponseEntity.badRequest().build();
             }
