@@ -33,17 +33,32 @@ public class AiRestController {
                 case "NORMAL":
                     logParaAnalisar = httpRequestService.gerarTrafegoNormal();
                     break;
-                case "ATAQUE_WEB":
-                    logParaAnalisar = httpRequestService.gerarAtaqueWeb();
+                case "SQL_INJECTION":
+                    logParaAnalisar = httpRequestService.gerarAtaqueSqlInjection();
                     break;
-                case "SCAN":
+                case "XSS_ATTACK":
+                    logParaAnalisar = httpRequestService.gerarAtaqueXss();
+                    break;
+                case "WEB_BRUTE_FORCE":
+                    logParaAnalisar = httpRequestService.gerarForcaBrutaWeb();
+                    break;
+                case "BRUTE_FORCE_FTP":
+                    logParaAnalisar = httpRequestService.gerarForcaBrutaFtp();
+                    break;
+                case "BRUTE_FORCE_SSH":
+                    logParaAnalisar = httpRequestService.gerarForcaBrutaSsh();
+                    break;
+                case "DOS_HULK":
+                    logParaAnalisar = httpRequestService.gerarAtaqueDosHulk();
+                    break;
+                case "DOS_GOLDENEYE":
+                    logParaAnalisar = httpRequestService.gerarAtaqueDosGoldenEye();
+                    break;
+                case "DOS_SLOWLORIS":
+                    logParaAnalisar = httpRequestService.gerarAtaqueDosSlowloris();
+                    break;
+                case "PORT_SCAN":
                     logParaAnalisar = httpRequestService.gerarVarreduraPortas();
-                    break;
-                case "BRUTE_FORCE":
-                    logParaAnalisar = httpRequestService.gerarForcaBruta();
-                    break;
-                case "ATAQUE_DOS":
-                    logParaAnalisar = httpRequestService.gerarAtaqueDoS();
                     break;
                 default:
                     return ResponseEntity.badRequest().build();

@@ -32,16 +32,35 @@ df_completo = df_completo.replace([np.inf, -np.inf], np.nan).dropna() #limpeza d
 def agrupar_ataques(label):
     if label == 'BENIGN':
         return 'BENIGN'
-    elif 'DoS' in label:
-        return 'DOS_ATTACK'
+
+    #ataques web
+    elif 'Sql Injection' in label:
+        return 'SQL_INJECTION'
+    elif 'XSS' in label:
+        return 'XSS_ATTACK'
+    elif 'Web Attack' in label and 'Brute Force' in label:
+        return 'WEB_BRUTE_FORCE'
+
+    #força Bruta(Patator)
+    elif 'FTP-Patator' in label:
+        return 'BRUTE_FORCE_FTP'
+    elif 'SSH-Patator' in label:
+        return 'BRUTE_FORCE_SSH'
+
+    #DoS
+    elif 'Hulk' in label:
+        return 'DOS_HULK'
+    elif 'GoldenEye' in label:
+        return 'DOS_GOLDENEYE'
+    elif 'slowloris' in label:
+        return 'DOS_SLOWLORIS'
+
+    # Varredura de Portas
     elif 'PortScan' in label:
         return 'PORT_SCAN'
-    elif 'Patator' in label or 'Brute Force' in label:
-        return 'BRUTE_FORCE'
-    elif 'Web Attack' in label:
-        return 'WEB_ATTACK'
+
     else:
-        return 'OUTRO_ATAQUE'
+        return 'OUTRA_AMEACA'
 
 df_completo[' Label'] = df_completo[' Label'].apply(agrupar_ataques)
 
@@ -68,3 +87,8 @@ anomalias_detectadas = df_completo[df_completo['predicao'] != 'BENIGN']
 print(f"\nResumo do Treinamento:")
 print(f"Total de logs analisados: {len(df_completo)}")
 print(f"Possíveis ataques detectados pela IA: {len(anomalias_detectadas)}")
+
+print("Classes identificadas pelo modelo:")
+for classe in np.unique(Y):
+    total = np.sum(Y == classe)
+    print(f" - {classe}: {total} amostras")
