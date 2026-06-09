@@ -32,7 +32,7 @@ export default function DashboardPage() {
   const [resultado, setResultado] = useState<IaResponse | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState(templates.NORMAL);
+  const [formData, setFormData] = useState<Record<string, number | string>>(templates.NORMAL);
 
   //api com conexão para produção
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
@@ -51,7 +51,7 @@ export default function DashboardPage() {
       const data = await res.json();
       setResultado(data);
     } catch (err) {
-      setErro('Falha de conexão. O Spring Boot está rodando?');
+      setErro('Falha de conexão ou formatação');
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function DashboardPage() {
       const data = await res.json();
       setResultado(data);
     } catch (err) {
-      setErro('Falha de conexão. O Spring Boot está rodando?');
+      setErro('Falha de conexão ou formatação');
     } finally {
       setLoading(false);
     }
@@ -117,19 +117,19 @@ export default function DashboardPage() {
               <button onClick={() => simular('PORT_SCAN')} className="w-full text-left px-5 py-4 text-lg bg-indigo-900/30 text-indigo-400 border border-indigo-800 hover:bg-indigo-800/50 rounded transition font-bold">
                 Port Scan
               </button>
-              <button onClick={() => simular('SQL_INJECTION')} className="w-full text-left px-5 py-4 text-lg bg-pink-900/30 text-pink-400 border border-pink-800 hover:bg-pink-800/50 rounded transition">
+              <button onClick={() => simular('SQL_INJECTION')} className="w-full text-left px-5 py-4 text-lg bg-purple-900/30 text-purple-400 border border-purple-800 hover:bg-purple-800/50 rounded transition">
                 SQL Injection
               </button>
-              <button onClick={() => simular('XSS_ATTACK')} className="w-full text-left px-5 py-4 text-lg bg-pink-900/30 text-pink-400 border border-pink-800 hover:bg-pink-800/50 rounded transition">
+              <button onClick={() => simular('XSS_ATTACK')} className="w-full text-left px-5 py-4 text-lg bg-purple-900/30 text-purple-400 border border-purple-800 hover:bg-purple-800/50 rounded transition">
                 XSS Attack
               </button>
-              <button onClick={() => simular('WEB_BRUTE_FORCE')} className="w-full text-left px-5 py-4 text-lg bg-pink-900/30 text-pink-400 border border-pink-800 hover:bg-pink-800/50 rounded transition">
+              <button onClick={() => simular('WEB_BRUTE_FORCE')} className="w-full text-left px-5 py-4 text-lg bg-purple-900/30 text-purple-400 border border-purple-800 hover:bg-purple-800/50 rounded transition">
                 Web Brute Force
               </button>
-              <button onClick={() => simular('BRUTE_FORCE_FTP')} className="w-full text-left px-5 py-4 text-lg bg-orange-900/30 text-orange-400 border border-orange-800 hover:bg-orange-800/50 rounded transition">
+              <button onClick={() => simular('BRUTE_FORCE_FTP')} className="w-full text-left px-5 py-4 text-lg bg-yellow-900/30 text-yellow-400 border border-yellow-800 hover:bg-yellow-800/50 rounded transition">
                 Brute Force (FTP)
               </button>
-              <button onClick={() => simular('BRUTE_FORCE_SSH')} className="w-full text-left px-5 py-4 text-lg bg-orange-900/30 text-orange-400 border border-orange-800 hover:bg-orange-800/50 rounded transition">
+              <button onClick={() => simular('BRUTE_FORCE_SSH')} className="w-full text-left px-5 py-4 text-lg bg-yellow-900/30 text-yellow-400 border border-yellow-800 hover:bg-yellow-800/50 rounded transition">
                 Brute Force (SSH)
               </button>
               <button onClick={() => simular('DOS_HULK')} className="w-full text-left px-5 py-4 text-lg bg-red-900/30 text-red-400 border border-red-800 hover:bg-red-800/50 rounded transition">
@@ -178,8 +178,13 @@ export default function DashboardPage() {
                       <input
                           type="number"
                           step="any"
-                          value={formData[key as keyof typeof formData]}
-                          onChange={(e) => setFormData({ ...formData, [key]: Number(e.target.value) })}
+                          //mudança pra permitir um valor nulo apenas para colocar melhor os valores
+                          value={formData[key as keyof typeof formData] === '' ? '' : formData[key as keyof typeof formData]}
+                          onChange={(e) => {
+                            const valorDigitado = e.target.value;
+                            setFormData({...formData, [key]: valorDigitado === '' ? '' : Number(valorDigitado)
+                            });
+                          }}
                           className="w-full bg-neutral-950 border border-neutral-700 rounded p-3 text-xl text-white focus:border-emerald-500 focus:outline-none transition"
                       />
                     </div>
@@ -201,7 +206,7 @@ export default function DashboardPage() {
                 {resultado && !loading && (
                     <div className={`p-8 border-2 rounded-lg ${resultado.alerta_seguranca ? 'border-red-500 bg-red-950/20' : 'border-emerald-500 bg-emerald-950/20'}`}>
                       <p className="mb-4">
-                        <span className="text-neutral-500 text-lg">Veredito: </span>
+                        <span className="text-neutral-500 text-lg">Inferência: </span>
                         <strong className={`text-2xl block mt-2 ${resultado.alerta_seguranca ? 'text-red-400' : 'text-emerald-400'}`}>
                           {resultado.alerta_seguranca ? 'Ataque Detectado >:(' : 'Tráfego Seguro :) '}
                         </strong>
